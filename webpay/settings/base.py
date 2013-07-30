@@ -404,3 +404,6 @@ PRODUCT_DESCRIPTION_LENGTH = 255
 # 'name') that have an implied short length. Values that exceed the maximum will
 # trigger form errors.
 SHORT_FIELD_MAX_LENGTH = 255
+
+# When True, use zlib to make cookie values smaller.
+COMPRESS_ENCRYPTED_COOKIE = True
