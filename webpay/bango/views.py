@@ -121,13 +121,13 @@ def error(request):
                   .format(code=request.GET.get('ResponseCode')))
         return system_error(request, code=msg.BAD_BANGO_CODE)
 
-    result = _record(request)
-    if result is not RECORDED_OK:
-        return system_error(request, code=result)
-
     if request.GET.get('ResponseCode') == 'CANCEL':
         return render(request, 'bango/cancel.html',
                       {'error_code': msg.USER_CANCELLED})
+
+    result = _record(request)
+    if result is not RECORDED_OK:
+        return system_error(request, code=result)
 
     if request.GET.get('ResponseCode') == 'NOT_SUPPORTED':
         # This is a credit card or price point / region mismatch.

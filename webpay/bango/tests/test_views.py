@@ -77,6 +77,8 @@ class TestBangoReturn(BasicSessionCase):
                         url='bango.error',
                         expected_status=200)
         self.assertTemplateUsed(res, 'bango/cancel.html')
+        assert not slumber.bango.notification.post.called, (
+            'cancel should not call the notification API')
 
     def test_not_error(self, payment_notify, slumber):
         self.call(overrides={'ResponseCode': 'OK'}, url='bango.error',
