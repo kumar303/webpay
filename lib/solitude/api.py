@@ -304,9 +304,59 @@ class SolitudeAPI(SlumberWrapper):
         return transaction
 
 
+class UniversalSolitudeAPI(SolitudeAPI):
+    """
+    A Solitude API that connects to the universal payment provider API.
+    """
+
+    def __init__(self, *args, **kw):
+        super(UniversalSolitudeAPI, self).__init__(*args, **kw)
+        self.provider = None
+
+    def api(self):
+        assert self.provider, 'self.provider has not been set'
+        return getattr(self.slumber.zippy, self.provider)
+
+    def set_provider(self, provider=None):
+        self.provider = provider or settings.PAYMENT_PROVIDER
+
+    def configure_product_for_billing(self, transaction_uuid,
+                                      seller_uuid,
+                                      product_id, product_name,
+                                      redirect_url_onsuccess,
+                                      redirect_url_onerror,
+                                      prices, icon_url,
+                                      user_uuid, application_size,
+                                      source='unknown',
+                                      provider=None):
+        """
+        Start a payment provider transaction to begin the purchase flow.
+
+        TODO(Kumar): rename this function when we no longer need to
+        override the old one.
+        """
+        self.set_provider(provider)
+        # e.g. self.api().transactions.post(...)
+        raise NotImplementedError
+
+    def create_product(self, external_id, product_name, seller,
+                       provider=None):
+        """
+        Creates a product and a payment provider ID on the fly in solitude.
+        """
+        self.set_provider(provider)
+        # e.g. self.api().products.post(...)
+        raise NotImplementedError
+
+
 if not settings.SOLITUDE_URL:
     # This will typically happen when Sphinx builds the docs.
     warnings.warn('SOLITUDE_URL not found, not setting up client')
     client = None
 else:
-    client = SolitudeAPI(settings.SOLITUDE_URL, settings.SOLITUDE_OAUTH)
+    args = (settings.SOLITUDE_URL, settings.SOLITUDE_OAUTH)
+    if settings.UNIVERSAL_PROVIDER:
+        log.info('Using UniversalSolitudeAPI')
+        client = UniversalSolitudeAPI(*args)
+    else:
+        client = SolitudeAPI(*args)
