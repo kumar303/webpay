@@ -543,7 +543,7 @@ SIG_CHECK_TYP = 'mozilla/payments/sigcheck/v1'
 # Use this setting carefully!
 SIMULATED_NETWORK = None
 
-SITE_URL = host
+SITE_URL = host.rstrip('/')
 
 # This is the URL lib.solitude.api uses to connect to the pay server. If this
 # is none the solitude api tests don't run as we currently don't have a mock
